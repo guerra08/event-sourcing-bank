@@ -1,14 +1,19 @@
 import java.math.BigDecimal
 
-fun rehydrate(accountId: String, events: Collection<Event>): BankAccount {
-    val account = BankAccount(accountId)
+class BankAccount private constructor(val accountId: String) {
 
-    events.forEach(account::apply)
+    companion object {
+        /**
+         * Rehydrate is the only way to obtain a BankAccount instance
+         */
+        fun rehydrate(accountId: String, events: Collection<Event>): BankAccount {
+            val account = BankAccount(accountId)
 
-    return account
-}
+            events.forEach(account::apply)
 
-class BankAccount(val accountId: String) {
+            return account
+        }
+    }
 
     private var _balance: BigDecimal = BigDecimal.ZERO
     val balance: BigDecimal get() = _balance

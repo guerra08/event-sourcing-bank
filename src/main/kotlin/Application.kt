@@ -1,3 +1,4 @@
+import BankAccount.Companion.rehydrate
 import java.math.BigDecimal
 
 val eventStore = appendOnlyList<Event>()
@@ -7,6 +8,9 @@ fun appendEvent(event: Event) {
 }
 
 fun main() {
+
+    // We only append to the eventStore
+    // Other than that, we can only read
 
     appendEvent(
         AccountCreated(
@@ -28,8 +32,10 @@ fun main() {
         )
     )
 
+    // Filtering for my account id
     val events = eventStore.records().filter { it.accountId == "1" }
 
+    // In order to have an account instance, we need to rehydrate from the series of events
     val account = rehydrate("1", events)
 
     println(account)
