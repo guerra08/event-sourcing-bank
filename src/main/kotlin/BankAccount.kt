@@ -7,6 +7,9 @@ class BankAccount private constructor(val accountId: String) {
          * Rehydrate is the only way to obtain a BankAccount instance
          */
         fun rehydrate(accountId: String, events: Collection<Event>): BankAccount {
+            if (events.isEmpty()) throw IllegalArgumentException("Events cannot be empty")
+            if (events.first() !is AccountCreated) throw IllegalStateException("First event needs to be AccountCreated event")
+
             val account = BankAccount(accountId)
 
             events.forEach(account::apply)

@@ -3,40 +3,41 @@ import java.math.BigDecimal
 
 val eventStore = appendOnlyList<Event>()
 
-fun appendEvent(event: Event) {
-    eventStore.append(event)
-}
+fun <T> AppendOnlyList<T>.ofAccountId(accountId: String) where T : Event =
+    this.records().filter { it.accountId == accountId }.sortedBy { it.timestamp }
+
+private const val accountId = "1"
 
 fun main() {
 
     // We only append to the eventStore
     // Other than that, we can only read
 
-    appendEvent(
+    eventStore.append(
         AccountCreated(
-            accountId = "1",
+            accountId = accountId,
         )
     )
 
-    appendEvent(
+    eventStore.append(
         Deposit(
-            accountId = "1",
+            accountId = accountId,
             amount = BigDecimal("100.00")
         )
     )
 
-    appendEvent(
+    eventStore.append(
         Withdrawal(
-            accountId = "1",
+            accountId = accountId,
             amount = BigDecimal("50.00")
         )
     )
 
-    // Filtering for my account id
-    val events = eventStore.records().filter { it.accountId == "1" }
+    // Filtering for my account id, sorting it by timestamp
+    val events = eventStore.ofAccountId(accountId)
 
     // In order to have an account instance, we need to rehydrate from the series of events
-    val account = rehydrate("1", events)
+    val account = rehydrate(accountId, events)
 
     println(account)
 }
